@@ -114,7 +114,7 @@ namespace BladeAndSoulGossipCards
                 
                 foreach(var c in  suit.Cards)
                 {
-                    var card = new Card(c.Propertys) { No = c.No, Group = suit.Name };
+                    var card = new Card(c.Propertys, c.MaxAppreciation) { No = c.No, Group = suit.Name };
                     cards.Add(card);
                 }
 

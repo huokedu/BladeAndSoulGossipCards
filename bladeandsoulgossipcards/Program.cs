@@ -16,23 +16,23 @@ namespace BladeAndSoulGossipCards
             
             CardSet set = CardSet.Instance;
 
-            System.Console.WriteLine("劍靈八卦計算器");
+            System.Console.WriteLine("劍靈八卦牌計算器");
             System.Console.WriteLine("讀取資源檔data.txt...");
-            set.Load("data.txt");
+            
+            try
+            {
+                set.Load("data.txt");    
+            }
+            catch
+            {
+                System.Console.WriteLine("找不到data.txt");
+                return;
+            }
 
 
             var filterSuits = _ShowSuitFilter();
 
-            
-
-
-            _ShowProperty();
-
-
-            
-
-            System.Console.Write("\n輸入篩選條件(範例:LIFE GRID_FILE):");
-            var data = System.Console.ReadLine();
+            PropertyValue[] filterPropertys = _InputProperty();
 
             System.Console.Write("\n輸出格式1.csv 2.html(預設1):");
             var fileFormat = System.Console.ReadLine();
@@ -44,22 +44,7 @@ namespace BladeAndSoulGossipCards
             int.TryParse(outCount, out outAmount);
 
 
-
-
-            var propertyStrings = data.Split( new char[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-
-            List<PROPERTY_TYPE> propertyTypes = new List<PROPERTY_TYPE>();
-            foreach (var propertyString in propertyStrings)
-            {
-                PROPERTY_TYPE pt ;
-                if(Enum.TryParse<PROPERTY_TYPE>(propertyString,true, out pt))
-                {
-                    propertyTypes.Add(pt);
-                }
-            }
-            
-
-            Property[] propertys = (from pt in propertyTypes select new Property{ Id = pt }).ToArray();
+            Property[] propertys = filterPropertys.ToArray();
             Card[] cards = set.Find(propertys);
             cards = _FilterCardWithSuit(cards , filterSuits);
 
@@ -109,7 +94,13 @@ namespace BladeAndSoulGossipCards
                                             }
 
                                             var s = new Suit(card1,card2,card3,card4,card5,card6,card7,card8);
-                                            suits.Add(s);
+
+                                            bool pass = (from filter in filterPropertys
+                                                        where s.GetValue(filter) < filter.Value
+                                                        select false).Count() == 0;
+
+                                            if (pass)
+                                                suits.Add(s);
                                             count++;
                                             
                                         }
@@ -128,19 +119,52 @@ namespace BladeAndSoulGossipCards
             
             System.Console.WriteLine(string.Format("檔案寫入中..."));
 
-            
-            
+
+
+            string path;
             if (fileFormat == "1")
-                _WriteCSV(suits.ToArray(), outAmount);
+                path = _WriteCSV(suits.ToArray(), outAmount);
             else if (fileFormat == "2")
-                _WriteHTML(suits.ToArray(), outAmount);
+                path = _WriteHTML(suits.ToArray(), outAmount);
             else
-                _WriteCSV(suits.ToArray(), outAmount);
+                path = _WriteCSV(suits.ToArray(), outAmount);
 
             
             System.Console.WriteLine("寫入完成.");
             _ShowThank();
             System.Console.ReadKey();
+
+            System.Diagnostics.Process.Start(path);
+        }
+
+        private static PropertyValue[] _InputProperty()
+        {
+            List<PropertyValue> values = new List<PropertyValue>();
+            while(true)
+            {
+                _ShowProperty();
+                System.Console.Write("\nQuit = 結束");
+                System.Console.Write("\n輸入篩選條件(範例:LIFE 5000):");
+                var propertyTypeValue = System.Console.ReadLine();
+                
+
+                try
+                {
+                    var typevalue = propertyTypeValue.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (typevalue[0].ToLower() == "quit")
+                        break;
+                    PropertyValue val = PropertyValue.Build(typevalue[0], typevalue[1]);
+                    values.Add(val);
+                }
+                catch (SystemException ex)
+                {
+                    System.Console.Write("\n錯誤:" + ex.Message );
+                    System.Console.WriteLine("按下任一鍵繼續...");
+                    System.Console.ReadKey();
+                }
+            }
+
+            return values.ToArray();
         }
 
         private static Card[] _FilterCardWithSuit(Card[] cards, string[] filterSuits)
@@ -186,7 +210,7 @@ namespace BladeAndSoulGossipCards
 @"謝謝您的使用
 
     拔山蓋世 龍裔 
-                軒轅與其快樂的夥伴們XD製作
+                軒轅與其快樂的夥伴們XD 製作
 ";
 
             System.Console.WriteLine(message);
@@ -216,11 +240,11 @@ TREATMENT               治療";
             System.Console.WriteLine(message);
         }
 
-        private static void _WriteCSV(Suit[] suits,int out_count)
+        private static string _WriteCSV(Suit[] suits,int out_count)
         {            
             using (var stream = new System.IO.StreamWriter( "output.csv" ,false , Encoding.UTF8))
             {
-                stream.WriteLine("攻擊,穿刺,命中,集中,爆擊,熟練,額外傷害,威脅,生命,防禦,閃避,格檔,爆擊防禦,韌性,傷害減免,回復,治療,1,2,3,4,5,6,7,8,");
+                stream.WriteLine("攻擊,穿刺,命中,集中,爆擊,熟練,額外傷害,威脅,生命,防禦,閃避,格檔,爆擊防禦,韌性,傷害減免,回復,治療,最大合成,1,2,3,4,5,6,7,8,");
                 foreach (var suit in suits)
                 {
                     
@@ -229,6 +253,8 @@ TREATMENT               治療";
                     {
                         line += val.Value + ",";
                     }
+
+                    line += suit.MaxAppreciation + ",";
 
                     foreach(var card in suit.Cards)
                     {
@@ -247,17 +273,19 @@ TREATMENT               治療";
                         break;
                 }
             }
+
+            return "output.csv" ;
             
         }
 
-        static void _WriteHTML(Suit[] suits, int out_count)
+        static string _WriteHTML(Suit[] suits, int out_count)
         {
             using (var stream = new System.IO.StreamWriter("output.html", false, Encoding.UTF8))
             {
                 stream.WriteLine("<html>");
                 stream.WriteLine("<body>");
                 stream.WriteLine("<table>");
-                stream.WriteLine("<tr><td>攻擊</td><td>穿刺</td><td>命中</td><td>集中</td><td>爆擊</td><td>熟練</td><td>額外傷害</td><td>威脅</td><td>生命</td><td>防禦</td><td>閃避</td><td>格檔</td><td>爆擊防禦</td><td>韌性</td><td>傷害減免</td><td>回復</td><td>治療</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>");
+                stream.WriteLine("<tr><td>攻擊</td><td>穿刺</td><td>命中</td><td>集中</td><td>爆擊</td><td>熟練</td><td>額外傷害</td><td>威脅</td><td>生命</td><td>防禦</td><td>閃避</td><td>格檔</td><td>爆擊防禦</td><td>韌性</td><td>傷害減免</td><td>回復</td><td>治療</td><td>最大合成</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>");
                 foreach (var suit in suits)
                 {
                     
@@ -266,7 +294,8 @@ TREATMENT               治療";
                     foreach (var val in suit.Values)
                     {
                         line += "<td>" + val.Value + "</td>";
-                    }                    
+                    }
+                    line += "<td>" + suit.MaxAppreciation + "</td>";
 
                     foreach (var card in suit.Cards)
                     {
@@ -289,6 +318,8 @@ TREATMENT               治療";
                 stream.WriteLine("</body>");
                 stream.WriteLine("</html>");
             }
+
+            return "output.html";
         }
 
         private static Queue<Card> _Find(Card[] cards, int no)

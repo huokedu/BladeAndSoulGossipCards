@@ -20,6 +20,8 @@ namespace BladeAndSoulGossipCards
         PropertyValue[] _PropertyValues;
         public int No;
         public string Group;
+        
+        public int MaxAppreciation;
 
         public PropertyValue[] Values { get { return _PropertyValues; } }
         
@@ -27,6 +29,13 @@ namespace BladeAndSoulGossipCards
         public Card(PropertyValue[] property_value)
         {            
             _PropertyValues = property_value;
+        }
+
+        public Card(PropertyValue[] propertyValue, int max_appreciation)
+            : this(propertyValue)
+        {            
+            
+            this.MaxAppreciation = max_appreciation;
         }
 
         internal int GetValue(Property property)

@@ -13,6 +13,8 @@ namespace BladeAndSoulGossipCards
 
         PropertyValue[] _Values;
 
+        public int MaxAppreciation { get; private set; }
+
         public PropertyValue[] Values { get { return _Values; } }
         public Suit(params Card[] cards)
         {
@@ -22,10 +24,15 @@ namespace BladeAndSoulGossipCards
             {
                 var value = new PropertyValue { Id = t, Value = _GetValue(new Property { Id = t }) };
                 values.Add(value);
-            }           
-
+            }
+            MaxAppreciation = _GetAppreciation(cards);
             _Values = values.ToArray();
 
+        }
+
+        private int _GetAppreciation(Card[] cards)
+        {
+            return (from card in cards select card.MaxAppreciation).Sum();
         }
         internal int GetValue(Property property)
         {
