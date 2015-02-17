@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace BladeAndSoulGossipCards
 {
+    using Regulus.Extension;
     class Program
     {
         static void Main(string[] args)
@@ -261,7 +262,7 @@ TREATMENT               治療";
                         string proper = "[";
                         foreach (var val in card.Values)
                         {
-                            proper += val.Id + "/";
+                            proper += string.Format("{0}({1})/", val.Id.GetEnumDescription(), val.Value);
                         }
                         proper = proper.Remove(proper.Length - 1);
                         proper += "]";
@@ -302,7 +303,7 @@ TREATMENT               治療";
                         string proper = "[";
                         foreach(var val in card.Values)
                         {
-                            proper += val.Id + "/";
+                            proper += string.Format("{0}({1})/", val.Id.GetEnumDescription(), val.Value);
                         }
                         proper = proper.Remove(proper.Length - 1);
                         proper += "]";

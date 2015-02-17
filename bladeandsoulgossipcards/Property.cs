@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 /*
  * /*
  
@@ -43,23 +44,39 @@ namespace BladeAndSoulGossipCards
     [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public enum PROPERTY_TYPE
     {        
-
+        [Regulus.Utility.EnumDescription("攻擊")]
         ATTACK,
-        PUNCTURE,        
+        [Regulus.Utility.EnumDescription("穿刺")]
+        PUNCTURE,
+        [Regulus.Utility.EnumDescription("命中")]
         HIT,
+        [Regulus.Utility.EnumDescription("集中")]
         FOCUS,
+        [Regulus.Utility.EnumDescription("爆擊")]
         CRIT,
+        [Regulus.Utility.EnumDescription("熟練")]
         SKILLED,
+        [Regulus.Utility.EnumDescription("額外傷害")]
         ADDITIONAL_DAMAGE,
+        [Regulus.Utility.EnumDescription("威脅")]
         THREAT,
+        [Regulus.Utility.EnumDescription("生命")]
         LIFE,
+        [Regulus.Utility.EnumDescription("防禦")]
         DEFENSE,
+        [Regulus.Utility.EnumDescription("閃避")]        
         DODGE,
+        [Regulus.Utility.EnumDescription("格擋")]
         GRID_FILE,
+        [Regulus.Utility.EnumDescription("爆擊防禦")]
         CRIT_DEFENSE,
+        [Regulus.Utility.EnumDescription("韌性")]
         TOUGHNESS,
+        [Regulus.Utility.EnumDescription("傷害減免")]
         DAMAGE_REDUCTION,
+        [Regulus.Utility.EnumDescription("回復")]
         REPLY,
+        [Regulus.Utility.EnumDescription("治療")]
         TREATMENT     
     };
     class Property
