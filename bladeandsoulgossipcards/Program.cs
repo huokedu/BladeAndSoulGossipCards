@@ -46,17 +46,16 @@ namespace BladeAndSoulGossipCards
 
 
             Property[] propertys = filterPropertys.ToArray();
-            Card[] cards = set.Find(propertys);
-            cards = _FilterCardWithSuit(cards , filterSuits);
+            Card[] cards = set.Find(propertys, filterSuits);            
 
-            Queue<Card> cards1 = _Find(cards, 1);
-            Queue<Card> cards2 = _Find(cards, 2);
-            Queue<Card> cards3 = _Find(cards, 3);
-            Queue<Card> cards4 = _Find(cards, 4);
-            Queue<Card> cards5 = _Find(cards, 5);
-            Queue<Card> cards6 = _Find(cards, 6);
-            Queue<Card> cards7 = _Find(cards, 7);
-            Queue<Card> cards8 = _Find(cards, 8);
+            Card[] cards1 = _Fill(_Assort(cards, 1), CardSet.Instance, 1);
+            Card[] cards2 = _Fill(_Assort(cards, 2), CardSet.Instance, 2);
+            Card[] cards3 = _Fill(_Assort(cards, 3), CardSet.Instance, 3);
+            Card[] cards4 = _Fill(_Assort(cards, 4), CardSet.Instance, 4);
+            Card[] cards5 = _Fill(_Assort(cards, 5), CardSet.Instance, 5);
+            Card[] cards6 = _Fill(_Assort(cards, 6), CardSet.Instance, 6);
+            Card[] cards7 = _Fill(_Assort(cards, 7), CardSet.Instance, 7);
+            Card[] cards8 = _Fill(_Assort(cards, 8), CardSet.Instance, 8);
 
             System.Int64 total = cards1.Count() * cards2.Count() * cards3.Count() * cards4.Count() * cards5.Count() * cards6.Count() * cards7.Count() * cards8.Count();
             System.Console.WriteLine(string.Format("{0}筆資料比對中...請稍候", total));
@@ -137,6 +136,17 @@ namespace BladeAndSoulGossipCards
 
             System.Diagnostics.Process.Start(path);
         }
+        
+        private static Card[] _Fill(Card[] cards, CardSet cardSet, int num)
+        {
+            if(cards.Length == 0)
+            {
+                return new Card[] { CardSet.Instance.GetEmpty(num)};
+            }
+            return cards;
+        }
+
+        
 
         private static PropertyValue[] _InputProperty()
         {
@@ -168,10 +178,7 @@ namespace BladeAndSoulGossipCards
             return values.ToArray();
         }
 
-        private static Card[] _FilterCardWithSuit(Card[] cards, string[] filterSuits)
-        {
-            return (from c in cards where filterSuits.Contains(c.Group) select c).ToArray();
-        }
+        
 
         private static string[] _ShowSuitFilter()
         {
@@ -323,13 +330,10 @@ TREATMENT               治療";
             return "output.html";
         }
 
-        private static Queue<Card> _Find(Card[] cards, int no)
+        private static Card[] _Assort(Card[] cards, int no)
         {
-            var cs = (from c in cards where c.No == no select c).ToList();            
-            if (cs.Count == 0)
-                //return new Card[] { new Card (new PropertyValue[0]){ No = no }};
-                return new Queue<Card>();
-            return new Queue<Card>(cs);
+            var cs = (from c in cards where c.No == no select c).ToArray();                        
+            return cs;
         }
     }
 }

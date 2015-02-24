@@ -10,35 +10,42 @@ namespace BladeAndSoulGossipCards
     {
         SetEffect[] _Effects;
         Card[] _Cards;
-        internal Card[] Find(Property[] propertys)
-        {
-            Card[] suitCards = _FindPropertyInSuit(propertys);
-            List<Card> cards = _FindProperty(propertys);
-            
 
+        internal Card[] Find(Property[] propertys, string[] filterSuits)
+        {
+
+            var cards = _FilterCardWithSuit(_Cards , filterSuits);
+            Card[] suitCards = _FindPropertyInSuit(cards , propertys);
+            cards = _FindProperty(cards,propertys).ToArray();
             return suitCards.Union(cards).ToArray();
         }
 
-        private List<Card> _FindProperty(Property[] propertys)
+        private static Card[] _FilterCardWithSuit(Card[] cards, string[] filterSuits)
+        {
+            return (from c in cards where filterSuits.Contains(c.Group) select c).ToArray();
+        }
+
+        private List<Card> _FindProperty(  Card[] cardset , Property[] propertys)
         {
             List<Card> cards = new List<Card>();
             foreach (var property in propertys)
             {
                 for(int no = 1 ; no <= 8 ; ++no)
                 {
-                    var c = (from card in _Cards
+                    var c = (from card in cardset
                              let val = card.GetValue(property)                             
                              where card.No == no 
                              orderby val descending
-                             select card).FirstOrDefault();                    
-                    cards.Add(c);
+                             select card).FirstOrDefault();
+                    if (c != null)
+                        cards.Add(c);
                 }
                 
             }
             return cards;
         }
 
-        private Card[] _FindPropertyInSuit(Property[] propertys)
+        private Card[] _FindPropertyInSuit( Card[] cardset,Property[] propertys)
         {
             Card[] totalCards = new Card[0];
             foreach (var property in propertys)
@@ -51,13 +58,14 @@ namespace BladeAndSoulGossipCards
                 {
                     for(int no = 1 ; no <= 8 ; ++ no)
                     {
-                        var card = (from c in _Cards
+                        var card = (from c in cardset
                                     let val = c.GetValue(property)
                                     orderby val descending
                                     where c.Group == suit && c.No == no
                                     select c).FirstOrDefault();
 
-                        cards.Add(card);
+                        if (card != null)
+                            cards.Add(card);
                     }
                 }
                 totalCards = totalCards.Union(cards).ToArray();
@@ -130,6 +138,17 @@ namespace BladeAndSoulGossipCards
                 yield return effect.Key;
             }            
         }
+
+
+
+        internal Card GetEmpty(int num)
+        {
+            var empty = new Card( new PropertyValue[0]);
+            empty.No = num;
+            return empty;
+        }
+
+        
     }
 }
 
