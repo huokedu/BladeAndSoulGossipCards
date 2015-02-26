@@ -6,12 +6,12 @@ using System.Text;
 
 namespace BladeAndSoulGossipCards
 {
-    class CardSet : Regulus.Utility.Singleton<CardSet>
+    public class CardSet : Regulus.Utility.Singleton<CardSet>
     {
         SetEffect[] _Effects;
         Card[] _Cards;
 
-        internal Card[] Find(Property[] propertys, string[] filterSuits)
+        public Card[] Find(Property[] propertys, string[] filterSuits)
         {
 
             var cards = _FilterCardWithSuit(_Cards , filterSuits);
@@ -100,10 +100,17 @@ namespace BladeAndSoulGossipCards
             return (from effect in _Effects where effect.Id == id select effect.GetValue(property)).Sum() > 0;
         }
 
-        internal void Load(string path)
+        public void Load(string path)
         {
             var text = System.IO.File.ReadAllText(path);
             var cardsuits = Newtonsoft.Json.JsonConvert.DeserializeObject<CardSuit[]>(text);
+
+            _Build(cardsuits);
+        }
+
+        public void Build(string stream)
+        {
+            var cardsuits = Newtonsoft.Json.JsonConvert.DeserializeObject<CardSuit[]>(stream);
 
             _Build(cardsuits);
         }
@@ -131,7 +138,7 @@ namespace BladeAndSoulGossipCards
             }
         }
 
-        internal IEnumerable<string> GetSuitNames()
+        public  IEnumerable<string> GetSuitNames()
         {
             foreach(var effect in from e in  _Effects group e by e.Id into g select g)
             {
@@ -141,7 +148,7 @@ namespace BladeAndSoulGossipCards
 
 
 
-        internal Card GetEmpty(int num)
+        public Card GetEmpty(int num)
         {
             var empty = new Card( new PropertyValue[0]);
             empty.No = num;

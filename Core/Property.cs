@@ -79,9 +79,10 @@ namespace BladeAndSoulGossipCards
         [Regulus.Utility.EnumDescription("治療")]
         TREATMENT     
     };
-    class Property
+    public class Property
     {
         [Newtonsoft.Json.JsonProperty("效果")]
+        
         public PROPERTY_TYPE Id;
     }
 }

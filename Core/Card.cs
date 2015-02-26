@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BladeAndSoulGossipCards
 {
-    class Card
+    public class Card
     {
         internal bool HasProperty(Property property)
         {        
@@ -42,5 +42,28 @@ namespace BladeAndSoulGossipCards
         {
             return _PropertyValues.GetValue(property);
         }
+    }
+
+    namespace Extend
+    {
+        public static class CardExtend
+        {
+            public static Card[] Assort(this Card[] cards, int no)
+            {
+                var cs = (from c in cards where c.No == no select c).ToArray();
+                return cs;
+            }
+
+            public static Card[] Fill(this Card[] cards, CardSet cardSet, int num)
+            {
+                if (cards.Length == 0)
+                {
+                    return new Card[] { CardSet.Instance.GetEmpty(num) };
+                }
+                return cards;
+            }
+        }
+
+        
     }
 }

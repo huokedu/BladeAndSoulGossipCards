@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BladeAndSoulGossipCards
 {
-    class PropertyValue : Property
+    public class PropertyValue : Property
     {
         [Newtonsoft.Json.JsonProperty("數值")]
         public int Value;

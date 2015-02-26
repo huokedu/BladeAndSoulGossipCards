@@ -5,7 +5,7 @@ using System.Text;
 
 namespace BladeAndSoulGossipCards
 {
-    class Suit
+    public class Suit
     {
         private Card[] _Cards;
 
@@ -34,7 +34,7 @@ namespace BladeAndSoulGossipCards
         {
             return (from card in cards select card.MaxAppreciation).Sum();
         }
-        internal int GetValue(Property property)
+        public int GetValue(Property property)
         {
             return (from v in _Values where v.Id == property.Id select v.Value).SingleOrDefault();
         }

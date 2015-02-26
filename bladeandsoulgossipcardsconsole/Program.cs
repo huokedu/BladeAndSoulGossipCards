@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 namespace BladeAndSoulGossipCards
 {
     using Regulus.Extension;
+    using Extend;
+    
     class Program
     {
         static void Main(string[] args)
@@ -48,14 +50,14 @@ namespace BladeAndSoulGossipCards
             Property[] propertys = filterPropertys.ToArray();
             Card[] cards = set.Find(propertys, filterSuits);            
 
-            Card[] cards1 = _Fill(_Assort(cards, 1), CardSet.Instance, 1);
-            Card[] cards2 = _Fill(_Assort(cards, 2), CardSet.Instance, 2);
-            Card[] cards3 = _Fill(_Assort(cards, 3), CardSet.Instance, 3);
-            Card[] cards4 = _Fill(_Assort(cards, 4), CardSet.Instance, 4);
-            Card[] cards5 = _Fill(_Assort(cards, 5), CardSet.Instance, 5);
-            Card[] cards6 = _Fill(_Assort(cards, 6), CardSet.Instance, 6);
-            Card[] cards7 = _Fill(_Assort(cards, 7), CardSet.Instance, 7);
-            Card[] cards8 = _Fill(_Assort(cards, 8), CardSet.Instance, 8);
+            Card[] cards1 = cards.Assort(1).Fill( CardSet.Instance, 1);
+            Card[] cards2 = cards.Assort(2).Fill(CardSet.Instance, 2);
+            Card[] cards3 = cards.Assort(3).Fill(CardSet.Instance, 3);
+            Card[] cards4 = cards.Assort(4).Fill(CardSet.Instance, 4);
+            Card[] cards5 = cards.Assort(5).Fill(CardSet.Instance, 5);
+            Card[] cards6 = cards.Assort(6).Fill(CardSet.Instance, 6);
+            Card[] cards7 = cards.Assort(7).Fill(CardSet.Instance, 7);
+            Card[] cards8 = cards.Assort(8).Fill(CardSet.Instance, 8);
 
             System.Int64 total = cards1.Count() * cards2.Count() * cards3.Count() * cards4.Count() * cards5.Count() * cards6.Count() * cards7.Count() * cards8.Count();
             System.Console.WriteLine(string.Format("{0}筆資料比對中...請稍候", total));
@@ -63,7 +65,6 @@ namespace BladeAndSoulGossipCards
             Regulus.Utility.TimeCounter timeCounter = new Regulus.Utility.TimeCounter();
 
             List<Suit> suits = new List<Suit>();
-
             
             foreach(var card1 in  cards1)
                 foreach(var card2 in  cards2)
@@ -105,9 +106,6 @@ namespace BladeAndSoulGossipCards
                                             
                                         }
 
-
-
-
             var result = suits.OrderByDescending((suit) => suit.GetValue(propertys[0]));
             foreach (var property in propertys.Skip(1))
             {
@@ -137,14 +135,7 @@ namespace BladeAndSoulGossipCards
             System.Diagnostics.Process.Start(path);
         }
         
-        private static Card[] _Fill(Card[] cards, CardSet cardSet, int num)
-        {
-            if(cards.Length == 0)
-            {
-                return new Card[] { CardSet.Instance.GetEmpty(num)};
-            }
-            return cards;
-        }
+        
 
         
 
@@ -330,11 +321,7 @@ TREATMENT               治療";
             return "output.html";
         }
 
-        private static Card[] _Assort(Card[] cards, int no)
-        {
-            var cs = (from c in cards where c.No == no select c).ToArray();                        
-            return cs;
-        }
+        
     }
 }
 
