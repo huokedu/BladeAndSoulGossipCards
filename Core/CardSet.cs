@@ -108,9 +108,9 @@ namespace BladeAndSoulGossipCards
             return (from effect in _Effects where effect.Id == id select effect.GetValue(property)).Sum() > 0;
         }
 
-        public void Load(string path)
+        public void Load(string text)
         {
-            var text = System.IO.File.ReadAllText(path);
+            
             var cardsuits = Newtonsoft.Json.JsonConvert.DeserializeObject<CardSuit[]>(text);
 
             _Build(cardsuits);

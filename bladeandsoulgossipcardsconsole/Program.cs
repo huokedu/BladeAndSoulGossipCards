@@ -24,7 +24,8 @@ namespace BladeAndSoulGossipCards
             
             try
             {
-                set.Load("data.txt");    
+                var text = System.IO.File.ReadAllText("data.txt");
+                set.Load(text);    
             }
             catch
             {
