@@ -11,6 +11,14 @@ namespace BladeAndSoulGossipCards
         SetEffect[] _Effects;
         Card[] _Cards;
 
+        public Card[] Cards { get {return _Cards;}}
+
+        public  Card[] Filter(Card[] cards , Property[] propertys)
+        {
+            Card[] suitCards = _FindPropertyInSuit(cards, propertys);
+            Card[] resultCards = _FindProperty(cards, propertys).ToArray();
+            return suitCards.Union(resultCards).ToArray();
+        }
         public Card[] Find(Property[] propertys, string[] filterSuits)
         {
 
@@ -25,7 +33,7 @@ namespace BladeAndSoulGossipCards
             return (from c in cards where filterSuits.Contains(c.Group) select c).ToArray();
         }
 
-        private List<Card> _FindProperty(  Card[] cardset , Property[] propertys)
+        private static List<Card> _FindProperty(  Card[] cardset , Property[] propertys)
         {
             List<Card> cards = new List<Card>();
             foreach (var property in propertys)

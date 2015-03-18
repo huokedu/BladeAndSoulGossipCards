@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using Regulus.Extension;
 namespace BladeAndSoulGossipCards
 {
     public class Card
@@ -41,6 +41,19 @@ namespace BladeAndSoulGossipCards
         internal int GetValue(Property property)
         {
             return _PropertyValues.GetValue(property);
+        }
+
+        public string ToDescription()
+        {
+            string proper = "[";
+            foreach (var val in Values)
+            {
+                proper += string.Format("{0}({1})/", val.Id.GetEnumDescription(), val.Value);
+            }
+            proper = proper.Remove(proper.Length - 1);
+            proper += "]";
+
+            return Group + proper;
         }
     }
 

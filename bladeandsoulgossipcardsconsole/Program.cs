@@ -257,14 +257,8 @@ TREATMENT               治療";
 
                     foreach(var card in suit.Cards)
                     {
-                        string proper = "[";
-                        foreach (var val in card.Values)
-                        {
-                            proper += string.Format("{0}({1})/", val.Id.GetEnumDescription(), val.Value);
-                        }
-                        proper = proper.Remove(proper.Length - 1);
-                        proper += "]";
-                        line += card.Group + proper + ",";
+                                            
+                        line += card.ToDescription() + ",";
                     }
                     stream.WriteLine(line);
 
