@@ -1,10 +1,9 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace BladeAndSoulGossipCards
 {
@@ -51,7 +50,7 @@ namespace BladeAndSoulGossipCards
             Property[] propertys = filterPropertys.ToArray();
             Card[] cards = set.Find(propertys, filterSuits);            
 
-            Card[] cards1 = cards.Assort(1).Fill( CardSet.Instance, 1);
+            Card[] cards1 = cards.Assort(1).Fill(CardSet.Instance, 1);
             Card[] cards2 = cards.Assort(2).Fill(CardSet.Instance, 2);
             Card[] cards3 = cards.Assort(3).Fill(CardSet.Instance, 3);
             Card[] cards4 = cards.Assort(4).Fill(CardSet.Instance, 4);
@@ -62,60 +61,28 @@ namespace BladeAndSoulGossipCards
 
             System.Int64 total = cards1.Count() * cards2.Count() * cards3.Count() * cards4.Count() * cards5.Count() * cards6.Count() * cards7.Count() * cards8.Count();
             System.Console.WriteLine(string.Format("{0}筆資料比對中...請稍候", total));
-            int count = 0;
-            Regulus.Utility.TimeCounter timeCounter = new Regulus.Utility.TimeCounter();
 
-            List<Suit> suits = new List<Suit>();
-            
-            foreach(var card1 in  cards1)
-                foreach(var card2 in  cards2)
-                    foreach(var card3 in  cards3)
-                        foreach(var card4 in  cards4)
-                            foreach(var card5 in  cards5)
-                                foreach(var card6 in  cards6)
-                                    foreach(var card7 in  cards7)
-                                        foreach(var card8 in  cards8)
-                                        {
-                                            if(timeCounter.Second > 1)
-                                            {
-                                                System.Console.WriteLine(string.Format("{0}/{1}...", count ,total));
 
-                                                timeCounter.Reset();
+            Regulus.Utility.TimeCounter runTime = new Regulus.Utility.TimeCounter();
 
-                                                var orders = suits.OrderBy((suit) => suit.GetValue(propertys[0]));
-                                                foreach (var property in propertys.Skip(1))
-                                                {
-                                                    orders = orders.ThenBy((suit) => suit.GetValue(property));
-                                                }
-
-                                                suits = orders.ToList();
-
-                                                if (suits.Count > outAmount)
-                                                    suits.RemoveRange(0, suits.Count - outAmount);
-
-                                            }
-
-                                            var s = new Suit(card1,card2,card3,card4,card5,card6,card7,card8);
-
-                                            bool pass = (from filter in filterPropertys
-                                                        where s.GetValue(filter) < filter.Value
-                                                        select false).Count() == 0;
-
-                                            if (pass)
-                                                suits.Add(s);
-                                            count++;
-                                            
-                                        }
-
-            var result = suits.OrderByDescending((suit) => suit.GetValue(propertys[0]));
-            foreach (var property in propertys.Skip(1))
+            var suitFinder = new SuitFinder(cards1, cards2, cards3, cards4, cards5, cards6, cards7, cards8);
+            Regulus.Utility.TimeCounter secondCounter = new Regulus.Utility.TimeCounter();
+            suitFinder.ProgressEvent += (count, amount, found) =>
             {
-                result = result.ThenByDescending((suit) => suit.GetValue(property));
-            }
-
-            suits = result.ToList();
-
+                if(secondCounter.Second > 1 || count / amount == 1)
+                {
+                    System.Console.WriteLine(string.Format("{1}/{2} ({3:0.00}%)...{0}(已找到)", found, count, amount, (float)count/(float) amount * 100));
+                    secondCounter.Reset();
+                }
+            };
+            List<Suit> suits = suitFinder.Find(filterPropertys, outAmount);
             
+
+
+            //List<Suit> suits = _SingThread(filterPropertys, outAmount, propertys, cards1, cards2, cards3, cards4, cards5, cards6, cards7, cards8, total);
+
+
+            System.Console.WriteLine(string.Format("花費秒數{0}" , runTime.Second));
             System.Console.WriteLine(string.Format("檔案寫入中..."));
 
 
@@ -134,6 +101,64 @@ namespace BladeAndSoulGossipCards
             System.Console.ReadKey();
 
             System.Diagnostics.Process.Start(path);
+        }
+
+        private static List<Suit> _SingThread(PropertyValue[] filterPropertys, int outAmount, Property[] propertys, Card[] cards1, Card[] cards2, Card[] cards3, Card[] cards4, Card[] cards5, Card[] cards6, Card[] cards7, Card[] cards8, System.Int64 total)
+        {
+            int count = 0;
+            Regulus.Utility.TimeCounter timeCounter = new Regulus.Utility.TimeCounter();
+
+            List<Suit> suits = new List<Suit>();
+
+
+            foreach (var card1 in cards1)
+                foreach (var card2 in cards2)
+                    foreach (var card3 in cards3)
+                        foreach (var card4 in cards4)
+                            foreach (var card5 in cards5)
+                                foreach (var card6 in cards6)
+                                    foreach (var card7 in cards7)
+                                        foreach (var card8 in cards8)
+                                        {
+                                            if (timeCounter.Second > 1)
+                                            {
+
+                                                var orders = suits.OrderBy((suit) => suit.GetValue(propertys[0]));
+                                                foreach (var property in propertys.Skip(1))
+                                                {
+                                                    orders = orders.ThenBy((suit) => suit.GetValue(property));
+                                                }
+
+                                                suits = orders.ToList();
+
+                                                if (suits.Count > outAmount)
+                                                    suits.RemoveRange(0, suits.Count - outAmount);
+
+                                                System.Console.WriteLine(string.Format("{0}/{1}...{2}", count, total, suits.Count));
+
+                                                timeCounter.Reset();
+                                            }
+
+                                            var s = new Suit(card1, card2, card3, card4, card5, card6, card7, card8);
+
+                                            bool pass = (from filter in filterPropertys
+                                                         where s.GetValue(filter) < filter.Value
+                                                         select false).Count() == 0;
+
+                                            if (pass)
+                                                suits.Add(s);
+                                            count++;
+
+                                        }
+
+            var result = suits.OrderByDescending((suit) => suit.GetValue(propertys[0]));
+            foreach (var property in propertys.Skip(1))
+            {
+                result = result.ThenByDescending((suit) => suit.GetValue(property));
+            }
+
+            suits = result.ToList();
+            return suits;
         }
         
         
@@ -313,8 +338,11 @@ TREATMENT               治療";
                 stream.WriteLine("</html>");
             }
 
+
+           
             return "output.html";
         }
+
 
         
     }
