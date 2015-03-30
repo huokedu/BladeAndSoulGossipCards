@@ -8,14 +8,26 @@ namespace BladeAndSoulGossipCards
 {
     public class SuitFinder
     {
-        public delegate void ProgressCallback(int count ,int total , int found );
+        public delegate void ProgressCallback(int count ,long total , int found );
         public event ProgressCallback ProgressEvent;
         Card[][] _CardSets;
-        int _TotalCards;
+        long _TotalCards;
+        int[] _BaseUnits;
         public SuitFinder(params Card[][] cardSets)
         {
             _CardSets = cardSets;
             _TotalCards = _Multiply((from cardSet in _CardSets select cardSet.Length));
+
+            _BuildBaseUint();
+        }
+
+        private void _BuildBaseUint()
+        {
+            _BaseUnits = new int[_CardSets.Length];
+            for (int i = 0; i < _BaseUnits.Length; ++i)
+            {
+                _BaseUnits[i] = _CardSetCount(i + 1);
+            }
         }
 
         public List<Suit> Find(PropertyValue[] filter_propertys,int out_amount )
@@ -30,17 +42,16 @@ namespace BladeAndSoulGossipCards
 
             object readLock = new object();
             int reads = 0;
-            
+            System.Threading.SpinWait sw = new System.Threading.SpinWait();
             Parallel.ForEach(rangePartitioner, (range, loopState) =>
             {
+                
                 Regulus.Utility.TimeCounter time = new Regulus.Utility.TimeCounter();
                 List<Suit> suits = new List<Suit>();
                 int count = 0;
                 //var range = new {Item1 = 0 , Item2 = _Total()};
-                for (int i = range.Item2 - 1; i >= range.Item1; --i, ++count)
+                for (long i = range.Item2 - 1; i >= range.Item1; --i, ++count)
                 {
-                    System.Threading.SpinWait sw = new System.Threading.SpinWait();
-                    sw.SpinOnce();
                     
                     int[] indexs = _GetIndexs(i);
                     var s = new Suit(
@@ -56,7 +67,7 @@ namespace BladeAndSoulGossipCards
                     bool pass = (from filter in filter_propertys
                                  where s.GetValue(filter) < filter.Value
                                  select false).Count() == 0;
-
+                    sw.SpinOnce();
                     if (pass)
                     {
                         suits.Add(s);
@@ -129,26 +140,31 @@ namespace BladeAndSoulGossipCards
             return _CardSets[set_index][card_index];
         }
 
-        private int[] _GetIndexs(int count)
+        private int[] _GetIndexs(long count)
         {
             var len = _CardSets.Length;
             var last = count;
             var indexs = new int[len];
             for (int i = 0; i < len; ++i)
             {
-                var total = _CardSetCount(i + 1);
+                var total = _GetBaseUnit(i);
                 if (total > 0)
                 {
-                    indexs[i] = last / total;
+                    indexs[i] = (int)last / total;
                     last = last % total;
                 }
                 else
                 {
-                    indexs[i] = last;
+                    indexs[i] = (int)last;
                 }
                 
             }
             return indexs;
+        }
+
+        private int _GetBaseUnit(int i)
+        {
+            return _BaseUnits[i];
         }
 
         private int _CardSetCount(int skip)
@@ -168,7 +184,7 @@ namespace BladeAndSoulGossipCards
             return number;
         }
 
-        private int _Total()
+        private long _Total()
         {            
             return _TotalCards;
         }

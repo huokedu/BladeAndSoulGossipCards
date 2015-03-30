@@ -89,11 +89,11 @@ namespace BladeAndSoulGossipCards
 
             string path;
             if (fileFormat == "1")
-                path = _WriteCSV(suits.ToArray(), outAmount);
+                path = _WriteCSV(_GetFileName(filterPropertys), suits.ToArray(), outAmount);
             else if (fileFormat == "2")
-                path = _WriteHTML(suits.ToArray(), outAmount);
+                path = _WriteHTML(_GetFileName(filterPropertys) , suits.ToArray(), outAmount);
             else
-                path = _WriteCSV(suits.ToArray(), outAmount);
+                path = _WriteCSV(_GetFileName(filterPropertys) , suits.ToArray(), outAmount);
 
             
             System.Console.WriteLine("寫入完成.");
@@ -101,6 +101,17 @@ namespace BladeAndSoulGossipCards
             System.Console.ReadKey();
 
             System.Diagnostics.Process.Start(path);
+        }
+
+        private static string _GetFileName(PropertyValue[] filter_propertys)
+        {
+            string path = "out_";
+            foreach(var property in filter_propertys)
+            {
+                path += string.Format("{0}[{1}]_", property.Id.GetEnumDescription(), property.Value); ;
+            }
+
+            return path.Remove(path.Length - 1);
         }
 
         private static List<Suit> _SingThread(PropertyValue[] filterPropertys, int outAmount, Property[] propertys, Card[] cards1, Card[] cards2, Card[] cards3, Card[] cards4, Card[] cards5, Card[] cards6, Card[] cards7, Card[] cards8, System.Int64 total)
@@ -265,9 +276,9 @@ TREATMENT               治療";
             System.Console.WriteLine(message);
         }
 
-        private static string _WriteCSV(Suit[] suits,int out_count)
-        {            
-            using (var stream = new System.IO.StreamWriter( "output.csv" ,false , Encoding.UTF8))
+        private static string _WriteCSV(string path,Suit[] suits,int out_count)
+        {
+            using (var stream = new System.IO.StreamWriter(path + ".csv", false, Encoding.UTF8))
             {
                 stream.WriteLine("攻擊,穿刺,命中,集中,爆擊,熟練,額外傷害,威脅,生命,防禦,閃避,格檔,爆擊防禦,韌性,傷害減免,回復,治療,最大合成,1,2,3,4,5,6,7,8,");
                 foreach (var suit in suits)
@@ -282,8 +293,7 @@ TREATMENT               治療";
                     line += suit.MaxAppreciation + ",";
 
                     foreach(var card in suit.Cards)
-                    {
-                                            
+                    {                                            
                         line += card.ToDescription() + ",";
                     }
                     stream.WriteLine(line);
@@ -293,13 +303,13 @@ TREATMENT               治療";
                 }
             }
 
-            return "output.csv" ;
+            return path + ".csv";
             
         }
 
-        static string _WriteHTML(Suit[] suits, int out_count)
+        static string _WriteHTML(string path,Suit[] suits, int out_count)
         {
-            using (var stream = new System.IO.StreamWriter("output.html", false, Encoding.UTF8))
+            using (var stream = new System.IO.StreamWriter(path + ".html", false, Encoding.UTF8))
             {
                 stream.WriteLine("<html>");
                 stream.WriteLine("<body>");
@@ -337,10 +347,7 @@ TREATMENT               治療";
                 stream.WriteLine("</body>");
                 stream.WriteLine("</html>");
             }
-
-
-           
-            return "output.html";
+            return path + ".html";
         }
 
 
