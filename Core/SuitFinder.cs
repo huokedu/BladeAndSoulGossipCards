@@ -20,6 +20,8 @@ namespace BladeAndSoulGossipCards
 
         public List<Suit> Find(PropertyValue[] filter_propertys,int out_amount )
         {
+
+            
             object suitSetLock = new object();
             List<Suit> suitSet = new List<Suit>();
             
@@ -37,6 +39,9 @@ namespace BladeAndSoulGossipCards
                 //var range = new {Item1 = 0 , Item2 = _Total()};
                 for (int i = range.Item2 - 1; i >= range.Item1; --i, ++count)
                 {
+                    System.Threading.SpinWait sw = new System.Threading.SpinWait();
+                    sw.SpinOnce();
+                    
                     int[] indexs = _GetIndexs(i);
                     var s = new Suit(
                         _GetCard(0, indexs[0]),
@@ -69,6 +74,8 @@ namespace BladeAndSoulGossipCards
                         _UpdateSet(ref suitSet, filter_propertys, out_amount, suitSetLock, reads, suits);
                         suits.Clear();
                         time.Reset();
+
+                        sw.SpinOnce();
                     }
                     
                 }
