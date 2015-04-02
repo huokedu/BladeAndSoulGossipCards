@@ -47,7 +47,7 @@ namespace BladeAndSoulGossipCards
 
             var groups = (from card in _Cards
                           group card by card.Group into g
-                          select new { Id = g.Key, Count = g.Count() }).ToArray();
+                          select new { Id = g.Key, Count = g.Count() });
 
             var gsum = (from g in groups select CardSet.Instance.GetValue(property, g.Id, g.Count)).Sum();
 

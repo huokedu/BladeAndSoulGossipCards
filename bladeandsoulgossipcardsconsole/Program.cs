@@ -50,14 +50,14 @@ namespace BladeAndSoulGossipCards
             Property[] propertys = filterPropertys.ToArray();
             Card[] cards = set.Find(propertys, filterSuits);            
 
-            Card[] cards1 = cards.Assort(1).Fill(CardSet.Instance, 1);
-            Card[] cards2 = cards.Assort(2).Fill(CardSet.Instance, 2);
-            Card[] cards3 = cards.Assort(3).Fill(CardSet.Instance, 3);
-            Card[] cards4 = cards.Assort(4).Fill(CardSet.Instance, 4);
-            Card[] cards5 = cards.Assort(5).Fill(CardSet.Instance, 5);
-            Card[] cards6 = cards.Assort(6).Fill(CardSet.Instance, 6);
-            Card[] cards7 = cards.Assort(7).Fill(CardSet.Instance, 7);
-            Card[] cards8 = cards.Assort(8).Fill(CardSet.Instance, 8);
+            var cards1 = cards.Assort(1).Fill(CardSet.Instance, 1);
+            var cards2 = cards.Assort(2).Fill(CardSet.Instance, 2);
+            var cards3 = cards.Assort(3).Fill(CardSet.Instance, 3);
+            var cards4 = cards.Assort(4).Fill(CardSet.Instance, 4);
+            var cards5 = cards.Assort(5).Fill(CardSet.Instance, 5);
+            var cards6 = cards.Assort(6).Fill(CardSet.Instance, 6);
+            var cards7 = cards.Assort(7).Fill(CardSet.Instance, 7);
+            var cards8 = cards.Assort(8).Fill(CardSet.Instance, 8);
 
             System.Int64 total = cards1.Count() * cards2.Count() * cards3.Count() * cards4.Count() * cards5.Count() * cards6.Count() * cards7.Count() * cards8.Count();
             System.Console.WriteLine(string.Format("{0}筆資料比對中...請稍候", total));

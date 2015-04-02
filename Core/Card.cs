@@ -63,8 +63,8 @@ namespace BladeAndSoulGossipCards
         {
             public static Card[] Assort(this Card[] cards, int no)
             {
-                var cs = (from c in cards where c.No == no select c).ToArray();
-                return cs;
+                var cs = (from c in cards where c.No == no select c);
+                return cs.ToArray();
             }
 
             public static Card[] Fill(this Card[] cards, CardSet cardSet, int num)

@@ -13,27 +13,27 @@ namespace BladeAndSoulGossipCards
 
         public Card[] Cards { get {return _Cards;}}
 
-        public  Card[] Filter(Card[] cards , Property[] propertys)
+        public  IEnumerable<Card> Filter(Card[] cards , Property[] propertys)
         {
             Card[] suitCards = _FindPropertyInSuit(cards, propertys);
-            Card[] resultCards = _FindProperty(cards, propertys).ToArray();
-            return suitCards.Union(resultCards).ToArray();
+            var resultCards = _FindProperty(cards, propertys);
+            return suitCards.Union(resultCards);
         }
         public Card[] Find(Property[] propertys, string[] filterSuits)
         {
 
             var cards = _FilterCardWithSuit(_Cards , filterSuits);
-            Card[] suitCards = _FindPropertyInSuit(cards , propertys);
-            cards = _FindProperty(cards,propertys).ToArray();
+            var suitCards = _FindPropertyInSuit(cards , propertys);
+            cards = _FindProperty(cards,propertys);
             return suitCards.Union(cards).ToArray();
         }
 
-        private static Card[] _FilterCardWithSuit(Card[] cards, string[] filterSuits)
+        private static IEnumerable< Card> _FilterCardWithSuit(Card[] cards, string[] filterSuits)
         {
-            return (from c in cards where filterSuits.Contains(c.Group) select c).ToArray();
+            return (from c in cards where filterSuits.Contains(c.Group) select c);
         }
 
-        private static List<Card> _FindProperty(  Card[] cardset , Property[] propertys)
+        private static List<Card> _FindProperty(  IEnumerable<Card> cardset , Property[] propertys)
         {
             List<Card> cards = new List<Card>();
             foreach (var property in propertys)
@@ -53,7 +53,7 @@ namespace BladeAndSoulGossipCards
             return cards;
         }
 
-        private Card[] _FindPropertyInSuit( Card[] cardset,Property[] propertys)
+        private Card[] _FindPropertyInSuit( IEnumerable<Card> cardset,Property[] propertys)
         {
             Card[] totalCards = new Card[0];
             foreach (var property in propertys)
